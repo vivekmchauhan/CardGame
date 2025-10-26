@@ -42,7 +42,16 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        StartNewGame(rows, cols);
+        // Try loading existing save first
+        if (File.Exists(saveFileName))
+        {
+            LoadGame();
+        }
+        else
+        {
+            StartNewGame(rows, cols);
+        }
+
 
         if (restartButton != null)
             restartButton.gameObject.SetActive(false);
@@ -215,6 +224,123 @@ public class GameManager : MonoBehaviour
     private void UpdateScoreUI()
     {
         if (scoreText != null) scoreText.text = $"Score: {score}";
+    }
+    #endregion
+
+    #region Save / Load
+    public void SaveGame()
+    {
+        var sd = new SaveData();
+        sd.rows = rows;
+        sd.cols = cols;
+        sd.score = score;
+        sd.seed = shuffleSeed;
+        sd.gameOver = cards.All(c => c.isMatched);
+        for (int i = 0; i < cards.Count; i++)
+        {
+            var c = cards[i];
+            var entry = new CardSaveEntry
+            {
+                index = i,
+                cardId = c.cardId,
+                isMatched = c.isMatched
+            };
+            sd.cards.Add(entry);
+        }
+
+        try
+        {
+            string json = JsonUtility.ToJson(sd, true);
+            File.WriteAllText(saveFileName, json);
+            statusText.text = "Saved";
+        }
+        catch (Exception ex)
+        {
+            statusText.text = "Save Error";
+        }
+    }
+
+    public void LoadGame()
+    {
+        if (!File.Exists(saveFileName))
+        {
+            statusText.text = "No save file";
+            return;
+        }
+
+        try
+        {
+            string json = File.ReadAllText(saveFileName);
+            var sd = JsonUtility.FromJson<SaveData>(json);
+
+            if (sd.gameOver)
+            {
+                score = sd.score;
+                rows = sd.rows;
+                cols = sd.cols;
+                shuffleSeed = sd.seed;
+                statusText.text = "You Win!";
+                if (restartButton != null)
+                    restartButton.gameObject.SetActive(true);
+                UpdateScoreUI();
+                return;
+            }
+
+
+            rows = sd.rows;
+            cols = sd.cols;
+            score = sd.score;
+            shuffleSeed = sd.seed;
+            rng = new System.Random(shuffleSeed);
+
+            foreach (Transform t in boardContainer)
+                Destroy(t.gameObject);
+            cards.Clear();
+            faceUpUnmatched.Clear();
+
+            var ordered = sd.cards.OrderBy(e => e.index).ToList();
+            for (int i = 0; i < ordered.Count; i++)
+            {
+                var entry = ordered[i];
+                GameObject go = Instantiate(cardPrefab, boardContainer);
+                Card card = go.GetComponent<Card>();
+                Sprite face = faceSprites[entry.cardId];
+                card.frontImage.sprite = face;
+                card.backImage.sprite = cardBackSprite;
+                card.Initialize(entry.cardId, face, i);
+                if (entry.isMatched)
+                {
+                    card.MarkMatched();
+                    card.ForceFlipDownImmediate();
+                    StartCoroutine(ShowMatchImmediate(card));
+                }
+                card.OnFlippedToFaceUp += OnCardFlippedToFaceUp;
+                card.OnMatched += OnCardMatched;
+                cards.Add(card);
+            }
+
+            UpdateScoreUI();
+            statusText.text = "Loaded";
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Load failed: " + ex);
+            statusText.text = "Load Error";
+        }
+    }
+
+    private IEnumerator ShowMatchImmediate(Card card)
+    {
+        card.ForceFlipDownImmediate();
+        yield return null;
+        card.StartCoroutine(card.DoFlip(true));
+        yield return new WaitForSeconds(card.flipDuration + 0.05f);
+        card.MarkMatched();
+    }
+
+    private void OnApplicationQuit()
+    {
+        SaveGame();
     }
     #endregion
 }
