@@ -399,13 +399,13 @@ MonoBehaviour:
   - {fileID: 21300000, guid: d45175ea788bbe64f91743836f8253a4, type: 3}
   scoreText: {fileID: 270470245}
   statusText: {fileID: 768486791}
-  flipClip: {fileID: 0}
-  matchClip: {fileID: 0}
-  mismatchClip: {fileID: 0}
-  gameoverClip: {fileID: 0}
   mismatchRevealDuration: 1
   scorePerMatch: 100
   scorePerMismatch: -10
+  flipClip: {fileID: 8300000, guid: d4009b1a48bb712468a29f73014dde4b, type: 3}
+  matchClip: {fileID: 8300000, guid: a6758056f3e451c4f98ab0b81b273de0, type: 3}
+  mismatchClip: {fileID: 8300000, guid: 4ded0fa59c01ba64090256bbdd3725ba, type: 3}
+  gameoverClip: {fileID: 8300000, guid: 1cd752aa0cbaf5444a97cccad59e0460, type: 3}
   restartButton: {fileID: 2020033464}
 --- !u!4 &626483410
 Transform:

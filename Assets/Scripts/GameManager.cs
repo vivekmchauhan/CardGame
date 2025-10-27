@@ -28,6 +28,13 @@ public class GameManager : MonoBehaviour
     public int scorePerMatch = 100;
     public int scorePerMismatch = -10;
 
+    [Header("Audio")]
+    public AudioClip flipClip;
+    public AudioClip matchClip;
+    public AudioClip mismatchClip;
+    public AudioClip gameoverClip;
+    private AudioSource audioSource;
+
     // Internal
     private List<Card> cards = new List<Card>();
     private List<Card> faceUpUnmatched = new List<Card>();
@@ -39,6 +46,10 @@ public class GameManager : MonoBehaviour
 
     private string saveFileName => Path.Combine(Application.persistentDataPath, "cardGame.json");
 
+    private void Awake()
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+    }
 
     private void Start()
     {
@@ -137,7 +148,7 @@ public class GameManager : MonoBehaviour
     {
         if (card.isMatched) return;
         if (!faceUpUnmatched.Contains(card)) faceUpUnmatched.Add(card);
-
+        PlaySound(flipClip);
         var matching = faceUpUnmatched.Where(c => c != card && c.cardId == card.cardId && !c.isMatched).ToList();
         if (matching.Count > 0)
         {
@@ -187,6 +198,7 @@ public class GameManager : MonoBehaviour
         b.MarkMatched();
         faceUpUnmatched.Remove(a);
         faceUpUnmatched.Remove(b);
+        PlaySound(matchClip);
         score += scorePerMatch;
         UpdateScoreUI();
 
@@ -203,7 +215,7 @@ public class GameManager : MonoBehaviour
     private void OnGameOver()
     {
         statusText.text = "You Win!";
-
+        PlaySound(gameoverClip);
         if (restartButton != null)
             restartButton.gameObject.SetActive(true);
     }
@@ -341,6 +353,15 @@ public class GameManager : MonoBehaviour
     private void OnApplicationQuit()
     {
         SaveGame();
+    }
+    #endregion
+
+    #region Audio
+    private void PlaySound(AudioClip clip)
+    {
+        Debug.Log("PlaySound: " + clip);
+        if (clip == null) return;
+        audioSource.PlayOneShot(clip);
     }
     #endregion
 }
