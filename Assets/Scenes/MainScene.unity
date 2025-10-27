@@ -390,7 +390,7 @@ MonoBehaviour:
   boardContainer: {fileID: 495567028}
   cardPrefab: {fileID: 9023379016700163565, guid: 1f827835a37ea314186aecfddf8935d5, type: 3}
   rows: 2
-  cols: 2
+  cols: 3
   cardBackSprite: {fileID: 21300000, guid: 2aa8f4be5911d74409d078aa7457220a, type: 3}
   faceSprites:
   - {fileID: 21300000, guid: 5b433c6b968ebb64cb640ddccba47232, type: 3}
@@ -588,7 +588,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 4
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -648,7 +648,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 705.3, y: 358.53}
+  m_AnchoredPosition: {x: 658.7, y: 358.53}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &963194225

@@ -124,7 +124,12 @@ public class GameManager : MonoBehaviour
             card.OnMatched += OnCardMatched;
             cards.Add(card);
         }
+        ConfigureBoardLayout();
+    }
+    #endregion
 
+    private void ConfigureBoardLayout()
+    {
         var grid = boardContainer.GetComponent<GridLayoutGroup>();
         if (grid != null)
         {
@@ -139,7 +144,6 @@ public class GameManager : MonoBehaviour
             grid.cellSize = new Vector2(200, 300);
         }
     }
-    #endregion
 
     #region Card events & matching
     private void OnCardFlippedToFaceUp(Card card)
@@ -147,7 +151,7 @@ public class GameManager : MonoBehaviour
         if (card.isMatched) return;
         if (!faceUpUnmatched.Contains(card)) faceUpUnmatched.Add(card);
         PlaySound(flipClip);
-        var matching = faceUpUnmatched.Where(c => c != card && c.cardId == card.cardId && !c.isMatched).ToList();
+        var matching = faceUpUnmatched.Where(c => c != card && c.cardId == card.cardId && !c.isMatched && c.isFaceUp).ToList();
         if (matching.Count > 0)
         {
             var other = matching[0];
@@ -272,6 +276,7 @@ public class GameManager : MonoBehaviour
 
     public void LoadGame()
     {
+        Debug.Log("Loading game from " + saveFileName);
         if (!File.Exists(saveFileName))
         {
             statusText.text = "No save file";
@@ -328,7 +333,7 @@ public class GameManager : MonoBehaviour
                 card.OnMatched += OnCardMatched;
                 cards.Add(card);
             }
-
+            ConfigureBoardLayout();
             UpdateScoreUI();
             statusText.text = "Loaded";
         }
@@ -357,7 +362,6 @@ public class GameManager : MonoBehaviour
     #region Audio
     private void PlaySound(AudioClip clip)
     {
-        Debug.Log("PlaySound: " + clip);
         if (clip == null) return;
         audioSource.PlayOneShot(clip);
     }
