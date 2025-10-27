@@ -53,19 +53,17 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        // Try loading existing save first
         if (File.Exists(saveFileName))
         {
             LoadGame();
         }
         else
         {
+            if (restartButton != null)
+                restartButton.gameObject.SetActive(false);
+
             StartNewGame(rows, cols);
         }
-
-
-        if (restartButton != null)
-            restartButton.gameObject.SetActive(false);
     }
 
     #region Game setup
@@ -186,7 +184,7 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.01f);
         faceUpUnmatched.RemoveAll(c => !c.isFaceUp || c.isMatched);
-
+        PlaySound(mismatchClip);
         score += scorePerMismatch;
         UpdateScoreUI();
     }
